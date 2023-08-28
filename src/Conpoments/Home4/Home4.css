@@ -1,0 +1,29 @@
+
+.parent {
+    display: flex;
+    flex-direction: row;
+    height: 600px;
+  }
+  
+  .child4 {
+    flex: 1;
+  }
+  
+  .child4:nth-of-type(1) {
+    background-color: #20289e;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+
+   
+  }
+  
+  .child4:nth-of-type(2) {
+    background-color: #ffffff;
+
+ 
+  }
+  .text{color: white;
+    width: 50%;
+    font-size: 23px;
+    }
