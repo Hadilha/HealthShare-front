@@ -7,6 +7,9 @@ import Account from "./Pages/Account/Account";
 import Signup from "./Pages/Signup";
 import Test from "./Pages/Test";
 import Home from "./Pages/Home";
+import { ThemeProvider, createTheme } from "@mui/material";
+
+const theme = createTheme()
 
 function isUserSignedUp() {
   return localStorage.getItem("id") && localStorage.getItem("token");
@@ -43,10 +46,10 @@ function AppRouting({ IsSignedUp, setIsSignedUp }) {
             key={path}
             path={path}
             element={element}
-            // requiresAuth && !IsSignedUp ?
-            //  <Navigate to="/" />
-            // : element
-            //  }
+          // requiresAuth && !IsSignedUp ?
+          //  <Navigate to="/" />
+          // : element
+          //  }
           />
         ))}
       </Routes>
@@ -56,10 +59,12 @@ function AppRouting({ IsSignedUp, setIsSignedUp }) {
 
 function App() {
   return (
-    <BrowserRouter>
-      <ResponsiveAppBar />
-      <AppRouting />
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <ResponsiveAppBar />
+        <AppRouting />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

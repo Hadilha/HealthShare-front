@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "./Account.css";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import { IconButton } from "@material-ui/core";
+import { IconButton } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 

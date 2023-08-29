@@ -1,25 +1,20 @@
-import React from "react";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Link from "@material-ui/core/Link";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { signUp } from "../Redux/actions/Useraction";
-import { useNavigate } from "react-router-dom";
-import Autocomplete from "@mui/material/Autocomplete";
-import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { FormControl } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import MenuItem from '@mui/material/MenuItem';
+import Paper from "@mui/material/Paper";
+import Select from '@mui/material/Select';
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { makeStyles } from "@mui/styles";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import * as yup from "yup";
 
 function Copyright() {
   return (
@@ -69,10 +64,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Signup(props) {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+const schema = yup
+  .object()
+  .shape({
+    username: yup.string().required("Username is required"),
+    fullname: yup.string().required("Full name is required"),
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Invalid email address"),
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters"),
+    role: yup.string().required("Role is required"),
+    
+    speciality: yup.string(),
+    number: yup
+      .number()
+      .typeError("That doesn't look like a phone number")
+      .positive("A phone number can't start with a minus")
+      .integer("A phone number can't include a decimal point")
+      .min(8)
+      .required("A phone number is required"),
+    address: yup.string().required("Address is required"),
+    region: yup.string().required("Region is required"),
+    notes: yup.string().required("Notes are required"),
+  })
+  
 
+const defaultValues = {
+  fullname: "",
+  password: "",
+  email: "",
+  role: "",
+  specialty: "",
+  address: "",
+  number: "",
+  username: "",
+};
+
+
+export default function Signup(props) {
   const [username, setUsername] = useState("");
   const [fullname, setfullname] = useState("");
   const [email, setEmail] = useState("");
@@ -83,44 +116,13 @@ export default function Signup(props) {
   const [region, setregion] = useState("");
   const [notes, setnotes] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setSelectedRole] = useState(null);
+  const [role, setSelectedRole] = useState("");
   //const [check, setSelectedCheck] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
+  // TODO  ADD custom selector for each reducer
   const user = useSelector((state) => state);
   const roleOptions = ["doctor", "patient"];
   //const checkOptions = [true, false];
-  const schema = yup
-    .object()
-    .shape({
-      username: yup.string().required("Username is required"),
-      fullname: yup.string().required("Full name is required"),
-      email: yup
-        .string()
-        .required("Email is required")
-        .email("Invalid email address"),
-      password: yup
-        .string()
-        .required("Password is required")
-        .min(6, "Password must be at least 6 characters"),
-      role: yup.string().nullable().required("Role is required"),
-      speciality: yup.string(),
-      number: yup
-        .number()
-        .typeError("That doesn't look like a phone number")
-        .positive("A phone number can't start with a minus")
-        .integer("A phone number can't include a decimal point")
-        .min(8)
-        .required("A phone number is required"),
-      address: yup.string().required("Address is required"),
-      region: yup.string().required("Region is required"),
-      notes: yup.string().required("Notes are required"),
-    })
-    .when("role", {
-      is: "doctor",
-      then: yup.object({
-        speciality: yup.string().required("Speciality is required for doctors"),
-      }),
-    });
   const createCredentials = (data) => {
     console.log("2");
     const credentials = {};
@@ -171,11 +173,22 @@ export default function Signup(props) {
     handleSubmit,
     control,
     setError,
-    formState: { errors },
+    formState,
+    setValue,
+    trigger
   } = useForm({
+    mode: "onChange",
+    defaultValues,
     resolver: yupResolver(schema),
   });
 
+
+  const { errors } = formState
+
+  const [test, setTest] = useState('')
+
+
+  console.log('Erros here ', errors)
   {
     /* const onSubmit = (data) => {
     console.log("hello");
@@ -199,9 +212,17 @@ export default function Signup(props) {
   const onSubmit = () => {
     console.log("onSubmit function called");
   };
-  console.log("role", role);
+  console.log("role", test);
   console.log("errors here ", errors);
   const classes = useStyles();
+
+  const handleChangeRole = async (e) => {
+    setValue('role',e.target.value);
+    setSelectedRole(e.target.value)
+    await trigger("role")
+  }
+
+  console.log("role here ", role)
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -290,32 +311,26 @@ export default function Signup(props) {
                 />
               )}
             />
-
-            <Controller
-              name="role"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <Autocomplete
-                  value={role}
-                  onChange={(event, newValue) => {
-                    setSelectedRole(newValue.toLowerCase());
-                  }}
-                  options={roleOptions}
-                  getOptionLabel={(option) => option}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Select a role"
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                    />
-                  )}
-                />
-              )}
-            />
+            <FormControl fullWidth variant="outlined">
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label="Role"
+                    value={role}
+                    error={!!errors.role}
+                    onChange={handleChangeRole}
+                  >
+                    <MenuItem value="">Select a role</MenuItem>
+                    <MenuItem value="doctor">Doctor</MenuItem>
+                    <MenuItem value="patient">Patient</MenuItem>
+                   </Select>
+                )}
+              />
+              {errors.role && <div>{errors.role.message}</div>}
+            </FormControl>
 
             {/*      <Controller
               name="check"
